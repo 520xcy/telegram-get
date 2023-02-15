@@ -4,7 +4,7 @@ services:
     image: 520xcy/telegram-get:latest
     environment:
       - PUID=1000 # 宿主机用户pid
-      - GUID=1000 # 宿主机用户gid
+      - PGID=1000 # 宿主机用户gid
     volumes:
       - 下载的目录:/workdir/data_online
       - 日志目录:/workdir/logs
