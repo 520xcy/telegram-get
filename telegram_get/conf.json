@@ -1,0 +1,20 @@
+{
+    "api": 01234,
+    "api_hash": "eeddfffdsdsf",
+    "proxyhost": "192.168.100.100",
+    "proxyport": 1080,
+    "break":100,
+    "watchchannel": [
+       
+    ],
+    "watchuser":[],
+    "filename_block": [
+        
+    ], 
+    "history": [
+        ["https://t.me/joinchat/xxx", 1, 99999]
+    ],
+    "error_notice": "https://t.me/aaa",
+    "forward_channel": "https://t.me/bbb",
+    "admin_id": "https://t.me/ccc"
+}

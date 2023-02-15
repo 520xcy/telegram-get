@@ -1,0 +1,7 @@
+.git*
+.DS_Store*
+._*
+telegram_get/data/*
+telegram_get/logs/*
+telegram_get/data_online/*
+telegram_get/.venv
