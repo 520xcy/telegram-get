@@ -68,7 +68,8 @@ class tg_watchon_class:
         @self.client.on(events.NewMessage)
         async def handler(event):
             # print("handler init success")
-            # print('sender: ' + str(event.input_sender) + 'to: ' + str(event.message.to_id))
+            print('sender:', str(event.input_sender),' to:', str(event.message.to_id))
+            print('message:', event.raw_text)
             logger.info(
                 f'sender: {str(event.input_sender)} to: {str(event.message.to_id)} event: {str(event)}')
 

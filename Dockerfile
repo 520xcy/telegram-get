@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.18.4
 
 # environment
 ENV MIRROR=http://mirrors.cloud.tencent.com/alpine
