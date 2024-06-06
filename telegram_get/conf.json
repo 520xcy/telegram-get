@@ -1,6 +1,7 @@
 {
     "api": 01234,
     "api_hash": "eeddfffdsdsf",
+    "bot_token":"",
     "proxyhost": "192.168.100.100",
     "proxyport": 1080,
     "break":100,
