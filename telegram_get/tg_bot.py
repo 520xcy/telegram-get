@@ -42,7 +42,7 @@ class tg_client:
 
         proxy = {'proxy_type': 'socks5', 'addr': self.conf['proxyhost'], 'port': int(self.conf['proxyport'])} if self.conf['proxyhost'] and self.conf['proxyport'] else {}
         
-        self.client = TelegramClient(os.path.join(self.data_storage_path, str(self.api_id)), self.api_id, self.api_hash, proxy=proxy).start(bot_token = self.bot_token)
+        self.client = TelegramClient(os.path.join(self.data_storage_path, 'bot_'+str(self.api_id)), self.api_id, self.api_hash, proxy=proxy).start(bot_token = self.bot_token)
 
         self.admin_id = (self.client.get_entity(self.conf['admin_id'])).id if isinstance(
             self.conf['admin_id'], str) else self.conf['admin_id'] if self.conf['admin_id'] else 0
