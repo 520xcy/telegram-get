@@ -161,19 +161,16 @@ class tg_client:
 
             if not is_user and self.db_check(str(entity_id), file_id):
                 self.logger.critical(f'数据库已存在:{file_name}')
-                await event.reply(f'数据库已存在:{file_name}')
                 return False
 
             if os.path.isfile(file_name):
                 self.logger.critical(f'文件已存在:{file_name}')
-                await event.reply(f'文件已存在:{file_name}')
                 return False
 
             if os.path.isfile(file_name+'.download'):
                 offset = os.path.getsize(file_name+'.download')
 
             self.logger.critical(f'Start Download File: {file_name}')
-            await event.reply(f'Start Download File: {file_name}')
             try:
                 self.download.update(
                     {file_name: {'total': file_size, 'now': offset}})
@@ -189,7 +186,6 @@ class tg_client:
             else:
                 os.rename(file_name+'.download', file_name)
                 self.logger.critical(f'Finish Download File: {file_name}')
-                await event.reply(f'Finish Download File: {file_name}')
                 if not is_user:
                     self.db_write(str(entity_id), file_id)
             finally:
