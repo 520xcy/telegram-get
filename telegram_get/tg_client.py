@@ -223,7 +223,7 @@ class tg_client:
                     await event.reply(f'Download Fail {xx[0]}')
                     pass
                 else:
-                    await event.reply(f'Download Complete {xx[0]}')
+                    await event.reply(f'Download Complete {xx[0]}/{xx[1]},{int(xx[2])}')
             return
 
             # await self.client.send_message(InputPeerUser(
