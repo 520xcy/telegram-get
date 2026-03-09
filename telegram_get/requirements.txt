@@ -1,2 +1,4 @@
 telethon
 pysocks
+python-socks[asyncio];platform_system == "Windows"
+

@@ -15,6 +15,10 @@ import json
 import shelve
 import shutil
 from log import get_logger
+import platform
+system = platform.system()  # 返回 'Windows', 'Linux', 'Darwin' 等
+if system == 'Windows':
+    import python_socks
 
 GB = 1024 ** 3
 MB = 1024 ** 2
@@ -40,8 +44,12 @@ class tg_client:
         if not os.path.exists(self.data_storage_path):
             os.mkdir(self.data_storage_path)
 
-        proxy = {'proxy_type': 'socks5', 'addr': self.conf['proxyhost'], 'port': int(self.conf['proxyport'])} if self.conf['proxyhost'] and self.conf['proxyport'] else {}
-        
+        if system == 'Windows':
+            proxy =(python_socks.ProxyType.SOCKS5, self.conf['proxyhost'], int(self.conf['proxyport']), True) if self.conf['proxyhost'] and self.conf['proxyport'] else ()
+        else:
+            proxy = {'proxy_type': 'socks5', 'addr': self.conf['proxyhost'], 'port': int(self.conf['proxyport'])} if self.conf['proxyhost'] and self.conf['proxyport'] else {}
+
+
         self.client = TelegramClient(os.path.join(self.data_storage_path, 'bot_'+str(self.api_id)), self.api_id, self.api_hash, proxy=proxy).start(bot_token = self.bot_token)
 
         self.admin_id = (self.client.get_entity(self.conf['admin_id'])).id if isinstance(

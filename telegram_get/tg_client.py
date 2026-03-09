@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from telethon import TelegramClient, sync, errors, events, utils
+from telethon import TelegramClient, sync,errors, events, utils
 from telethon.tl.types import PeerChannel, MessageMediaWebPage, PeerChat, InputPeerUser
 from telethon.tl.functions.messages import ForwardMessagesRequest
 from telethon.tl.functions.messages import SendMessageRequest
@@ -15,6 +15,11 @@ import json
 import shelve
 import shutil
 from log import get_logger
+import platform
+system = platform.system()  # 返回 'Windows', 'Linux', 'Darwin' 等
+if system == 'Windows':
+    import python_socks
+
 
 GB = 1024 ** 3
 MB = 1024 ** 2
@@ -39,13 +44,19 @@ class tg_client:
         if not os.path.exists(self.data_storage_path):
             os.mkdir(self.data_storage_path)
 
-        proxy = {'proxy_type': 'socks5', 'addr': self.conf['proxyhost'], 'port': int(self.conf['proxyport'])} if self.conf['proxyhost'] and self.conf['proxyport'] else {}
-        
-        self.client = TelegramClient(os.path.join(self.data_storage_path, 'client_'+str(self.api_id)), self.api_id, self.api_hash, proxy=proxy).start()
+        if system == 'Windows':
+            proxy =(python_socks.ProxyType.SOCKS5, self.conf['proxyhost'], int(self.conf['proxyport']), True) if self.conf['proxyhost'] and self.conf['proxyport'] else ()
+        else:
+            proxy = {'proxy_type': 'socks5', 'addr': self.conf['proxyhost'], 'port': int(self.conf['proxyport'])} if self.conf['proxyhost'] and self.conf['proxyport'] else {}
+
+        self.client = TelegramClient(os.path.join(self.data_storage_path, 'client_'+str(self.api_id)), self.api_id, self.api_hash, use_ipv6=False,proxy=proxy).start()
         self.myid = self.client.get_me().id
 
         self.admin_id = (self.client.get_entity(self.conf['admin_id'])).id if isinstance(
             self.conf['admin_id'], str) else self.conf['admin_id'] if self.conf['admin_id'] else 0
+
+        self.chat_id = (self.client.get_entity(
+            self.conf['chat_id'])).id if isinstance(self.conf['chat_id'], str) else self.conf['chat_id'] if self.conf['chat_id'] else 0
 
         self.forward_channel = (self.client.get_entity(
             self.conf['forward_channel'])).id if isinstance(self.conf['forward_channel'], str) else self.conf['forward_channel'] if self.conf['forward_channel'] else 0
@@ -64,18 +75,23 @@ class tg_client:
         @self.client.on(events.NewMessage)
         async def handler(event):
             # print("handler init success")
+
             print('sender:', str(event.input_sender),' to:', str(event.message.to_id))
             print('message:', event.raw_text)
             self.logger.info(
-                f'sender: {str(event.input_sender)} to: {str(event.message.to_id)} event: {str(event)}')
+            f'sender: {str(event.input_sender)} to: {str(event.message.to_id)} event: {str(event)}')
 
             from_id = event.from_id.user_id if str(
                 event.from_id).startswith('PeerUser') else None
 
-            to_id = event.message.to_id.user_id if str(
-                event.message.to_id).startswith('PeerUser') else None
+            chat_id = event.message.to_id.chat_id if str(
+                event.message.to_id).startswith('PeerChat') else None
+            
+            if from_id == self.admin_id and chat_id == self.chat_id and event.media is not None:
+                await self.media_download(entity_id=from_id, event=event, is_user=True)
+                return
 
-            if from_id == self.admin_id and to_id == self.myid:
+            if from_id == self.admin_id and chat_id == self.chat_id:
                 await self.text_command(event)
                 return
 
@@ -305,7 +321,10 @@ class tg_client:
         self.watchuser = []
         self.admin_id = (await self.client.get_entity(self.conf['admin_id'])).id if isinstance(
             self.conf['admin_id'], str) else self.conf['admin_id'] if self.conf['admin_id'] else 0
-
+        
+        self.chat_id = (await self.client.get_entity(self.conf['chat_id'])).id if isinstance(
+            self.conf['chat_id'], str) else self.conf['chat_id'] if self.conf['chat_id'] else 0
+        
         self.forward_channel = (await self.client.get_entity(
             self.conf['forward_channel'])).id if isinstance(self.conf['forward_channel'], str) else self.conf['forward_channel'] if self.conf['forward_channel'] else 0
 
@@ -382,7 +401,8 @@ class tg_client:
             'history':[_his.split('|') for _his in os.getenv('HISTORY','').split(',')] if os.getenv('HISTORY','') else [],
             'error_notice':os.getenv('ERROR_NOTICE'),
             'forward_channel':os.getenv('FORWARD_CHANNEL'),
-            'admin_id':os.getenv('ADMIN_ID')
+            'admin_id':os.getenv('ADMIN_ID'),
+            'chat_id':os.getenv('CHAT_ID')
         }
 
         if not os.path.exists(os.path.join(self.data_storage_path, 'conf.json')):

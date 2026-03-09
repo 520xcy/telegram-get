@@ -1,11 +1,13 @@
 version: "3"
 services:
   telegram-get:
-    image: 520xcy/telegram-get:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - PUID=1000 # 宿主机用户pid
       - PGID=1000 # 宿主机用户gid
     volumes:
-      - 下载的目录:/workdir/data_online
-      - 日志目录:/workdir/logs
+      - ./data_online:/workdir/data_online
+      - ./logs:/workdir/logs
     restart: unless-stopped
