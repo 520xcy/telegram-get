@@ -30,7 +30,7 @@ class tg_client:
 
         self.project_path = project_path
         self.data_storage_path = os.path.join(self.project_path, 'data_online')
-        self.historydb = os.path.join(self.project_path, 'history.shelve.db')
+        self.historydb = os.path.join(self.data_storage_path, 'history.shelve.db')
         self.conf = self.get_conf()
         self.api_id = int(self.conf['api'])
         self.breakcount = int(self.conf['break'])
